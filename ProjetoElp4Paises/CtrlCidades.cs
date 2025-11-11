@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProjetoElp4Paises
 {
-    internal class CtrlCidades:Controller
+    internal class CtrlCidades : Controller
     {
         protected ColCidades aColCidades;
         protected CtrlEstados aCtrlEstados;
@@ -56,6 +56,16 @@ namespace ProjetoElp4Paises
         public List<Cidades> TodasCidades()
         {
             return aDaoCidades.Listar();
+        }
+
+        public override object CarregaObj(int chave)
+        {
+            return aDaoCidades.CarregaObj(chave);
+        }
+
+        public override List<Object> Pesquisar(string chave)
+        {
+            return aDaoCidades.Pesquisar(chave).Cast<object>().ToList();
         }
     }
 }

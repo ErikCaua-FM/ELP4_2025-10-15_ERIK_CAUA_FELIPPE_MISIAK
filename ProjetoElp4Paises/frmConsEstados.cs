@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -20,6 +21,7 @@ namespace ProjetoElp4Paises
 
         protected override void Pesquisar()
         {
+            this.CarregaLv(txtCodigo.Text);
         }
 
         protected override void Incluir()
@@ -27,11 +29,13 @@ namespace ProjetoElp4Paises
             oFrmCadEstados.LimpaTxt();
             oFrmCadEstados.ConhecaObjeto(oEstado, aCtrlEstados);
             oFrmCadEstados.ShowDialog();
-            this.CarregaLv();
+            this.CarregaLv("");
         }
 
         protected override void Excluir()
         {
+            int chave = Convert.ToInt32(ListV.SelectedItems[0].SubItems[0].Text);
+            oEstado = (Estados)aCtrlEstados.CarregaObj(chave);
             string aux;
             oFrmCadEstados.ConhecaObjeto(oEstado, aCtrlEstados);
             oFrmCadEstados.LimpaTxt();
@@ -42,29 +46,48 @@ namespace ProjetoElp4Paises
             oFrmCadEstados.ShowDialog();
             oFrmCadEstados.DesbloquearTxt();
             oFrmCadEstados.btnSalvar.Text = aux;
-            this.CarregaLv();
+            this.CarregaLv("");
         }
 
         protected override void Alterar()
         {
+            int chave = Convert.ToInt32(ListV.SelectedItems[0].SubItems[0].Text);
+            oEstado = (Estados)aCtrlEstados.CarregaObj(chave);
             oFrmCadEstados.ConhecaObjeto(oEstado, aCtrlEstados);
             oFrmCadEstados.LimpaTxt();
             oFrmCadEstados.CarregaTxt();
             oFrmCadEstados.ShowDialog();
-            this.CarregaLv();
+            this.CarregaLv("");
         }
 
-        protected override void CarregaLv()
+        protected override void CarregaLv(string chave)
         {
-            ListV.Items.Clear();
-            foreach(var oEstado in aCtrlEstados.TodosEstados())
+            if(chave == string.Empty)
             {
-                ListViewItem item = new ListViewItem(Convert.ToString(oEstado.Codigo));
-                item.SubItems.Add(oEstado.Estado);
-                item.SubItems.Add(oEstado.UF);
-                item.SubItems.Add(Convert.ToString(oEstado.OPais.Codigo));
-                item.SubItems.Add(oEstado.OPais.Pais);
-                ListV.Items.Add(item);
+                ListV.Items.Clear();
+                foreach (var oEstado in aCtrlEstados.TodosEstados())
+                {
+                    ListViewItem item = new ListViewItem(Convert.ToString(oEstado.Codigo));
+                    item.SubItems.Add(oEstado.Estado);
+                    item.SubItems.Add(oEstado.UF);
+                    item.SubItems.Add(Convert.ToString(oEstado.OPais.Codigo));
+                    item.SubItems.Add(oEstado.OPais.Pais);
+                    item.Tag = oEstado;
+                    ListV.Items.Add(item);
+                }
+            }
+            else
+            {
+                ListV.Items.Clear();
+                foreach (var oEstado in aCtrlEstados.Pesquisar(chave).Cast<Estados>().ToList())
+                {
+                    ListViewItem item = new ListViewItem(Convert.ToString(oEstado.Codigo));
+                    item.SubItems.Add(oEstado.Estado);
+                    item.SubItems.Add(oEstado.UF);
+                    item.SubItems.Add(Convert.ToString(oEstado.OPais.Codigo));
+                    item.SubItems.Add(oEstado.OPais.Pais);
+                    ListV.Items.Add(item);
+                }
             }
         }
 
@@ -82,6 +105,25 @@ namespace ProjetoElp4Paises
                 oEstado = (Estados)obj;
             if (ctrl != null)
                 aCtrlEstados = (CtrlEstados)ctrl;
+            this.Pesquisar();
+        }
+
+        private void ListV_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.ListV.SelectedItems.Count > 0)
+            {
+                ListViewItem item = this.ListV.SelectedItems[0];
+
+                // Agora pegamos o país armazenado no Tag
+                Estados estadoSelecionado = (Estados)item.Tag;
+
+                // Atualiza o objeto oPais passado pelo outro formulário
+                oEstado.Codigo = estadoSelecionado.Codigo;
+                oEstado.Estado = estadoSelecionado.Estado;
+                oEstado.UF = estadoSelecionado.UF;
+                oEstado.OPais.Codigo = estadoSelecionado.OPais.Codigo;
+                oEstado.OPais.Pais = estadoSelecionado.OPais.Pais;
+            }
         }
     }
 }

@@ -15,7 +15,7 @@ namespace ProjetoElp4Paises
             InitializeComponent();
         }
 
-        protected virtual void CarregaLv()
+        protected virtual void CarregaLv(string chave)
         {
 
         }

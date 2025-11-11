@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -18,9 +19,18 @@ namespace ProjetoElp4Paises
             InitializeComponent();
         }
 
+        protected override void Sair()
+        {
+            if (btnSair.Text == "Selecionar")
+            {
+                int chave = Convert.ToInt32(ListV.SelectedItems[0].SubItems[0].Text);
+                oPais = (Paises)aCtrlPaises.CarregaObj(chave);
+            }
+            base.Sair();
+        }
         protected override void Pesquisar()
         {
-            this.CarregaLv();
+            this.CarregaLv(txtCodigo.Text);
         }
 
         protected override void Incluir()
@@ -28,11 +38,13 @@ namespace ProjetoElp4Paises
             oFrmCadPaises.LimpaTxt();
             oFrmCadPaises.ConhecaObjeto(oPais, aCtrlPaises);
             oFrmCadPaises.ShowDialog();
-            this.CarregaLv();
+            this.CarregaLv("");
         }
 
         protected override void Excluir()
         {
+            int chave = Convert.ToInt32(ListV.SelectedItems[0].SubItems[0].Text);
+            oPais = (Paises)aCtrlPaises.CarregaObj(chave);
             string aux;
             oFrmCadPaises.ConhecaObjeto(oPais, aCtrlPaises);
             oFrmCadPaises.LimpaTxt();
@@ -43,29 +55,48 @@ namespace ProjetoElp4Paises
             oFrmCadPaises.ShowDialog();
             oFrmCadPaises.DesbloquearTxt();
             oFrmCadPaises.btnSalvar.Text = aux;
-            this.CarregaLv();
+            this.CarregaLv("");
         }
 
         protected override void Alterar()
         {
+            int chave = Convert.ToInt32(ListV.SelectedItems[0].SubItems[0].Text);
+            oPais = (Paises)aCtrlPaises.CarregaObj(chave);
             oFrmCadPaises.ConhecaObjeto(oPais, aCtrlPaises);
             oFrmCadPaises.LimpaTxt();
             oFrmCadPaises.CarregaTxt();
             oFrmCadPaises.ShowDialog();
-            this.CarregaLv();
+            this.CarregaLv("");
         }
 
-        protected override void CarregaLv()
+        protected override void CarregaLv(string chave)
         {
-            ListV.Items.Clear();
-            foreach (var oPais in aCtrlPaises.TodosPaises())
+            if (chave == string.Empty)
             {
-                ListViewItem item = new ListViewItem(Convert.ToString(oPais.Codigo));
-                item.SubItems.Add(oPais.Pais);
-                item.SubItems.Add(oPais.Sigla);
-                item.SubItems.Add(oPais.Ddi);
-                item.SubItems.Add(oPais.Moeda);
-                ListV.Items.Add(item);
+                ListV.Items.Clear();
+                foreach (var oPais in aCtrlPaises.TodosPaises())
+                {
+                    ListViewItem item = new ListViewItem(Convert.ToString(oPais.Codigo));
+                    item.SubItems.Add(oPais.Pais);
+                    item.SubItems.Add(oPais.Sigla);
+                    item.SubItems.Add(oPais.Ddi);
+                    item.SubItems.Add(oPais.Moeda);
+                    item.Tag = oPais;
+                    ListV.Items.Add(item);
+                }
+            }
+            else
+            {
+                ListV.Items.Clear();
+                foreach (var oPais in aCtrlPaises.Pesquisar(chave).Cast<Paises>().ToList())
+                {
+                    ListViewItem item = new ListViewItem(Convert.ToString(oPais.Codigo));
+                    item.SubItems.Add(oPais.Pais);
+                    item.SubItems.Add(oPais.Sigla);
+                    item.SubItems.Add(oPais.Ddi);
+                    item.SubItems.Add(oPais.Moeda);
+                    ListV.Items.Add(item);
+                }
             }
         }
         public override void setFrmCadastro(object obj)
@@ -82,7 +113,25 @@ namespace ProjetoElp4Paises
                 oPais = (Paises)obj;
             if(ctrl != null)
                 aCtrlPaises = (CtrlPaises)ctrl;
+            this.Pesquisar();
         }
 
+        private void ListV_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.ListV.SelectedItems.Count > 0)
+            {
+                ListViewItem item = this.ListV.SelectedItems[0];
+
+                // Agora pegamos o país armazenado no Tag
+                Paises paisSelecionado = (Paises)item.Tag;
+
+                // Atualiza o objeto oPais passado pelo outro formulário
+                oPais.Codigo = paisSelecionado.Codigo;
+                oPais.Pais = paisSelecionado.Pais;
+                oPais.Sigla = paisSelecionado.Sigla;
+                oPais.Ddi = paisSelecionado.Ddi;
+                oPais.Moeda = paisSelecionado.Moeda;
+            }
+        }
     } 
 }

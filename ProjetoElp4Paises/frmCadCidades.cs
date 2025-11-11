@@ -26,14 +26,10 @@ namespace ProjetoElp4Paises
                 aCidade.DDD = txtDDD.Text;
                 aCidade.OEstado.Estado = txtEstado.Text;
                 aCidade.OEstado.Codigo = Convert.ToInt32(txtCodigoEstado.Text);
-                //if(this.btnSalvar.Text == "&Salvar")
-                {
+                if(this.btnSalvar.Text == "&Salvar")
                     MessageBox.Show(aCtrlCidades.Salvar(aCidade.Clone()));
-                }
-                /*else if(this.btnSalvar.Text == "Excluir")
-                {
-                    aCtrlCidades.Excluir(aCidade);
-                }*/
+                else if(this.btnSalvar.Text == "Excluir")
+                    MessageBox.Show(aCtrlCidades.Excluir(aCidade.Clone()));
             }
         }
         public override void CarregaTxt()

@@ -27,14 +27,10 @@ namespace ProjetoElp4Paises
                 oEstado.UF = txtUF.Text;
                 oEstado.OPais.Pais = txtPais.Text;
                 oEstado.OPais.Codigo = Convert.ToInt32(txtCodigoPais.Text);
-                //if(this.btnSalvar.Text == "&Salvar")
-                //{
+                if(this.btnSalvar.Text == "&Salvar")
                     MessageBox.Show(aCtrlEstados.Salvar(oEstado.Clone()));
-                //}
-                //else if(this.btnSalvar.Text == "Excluir")
-                //{
-                //    aCtrlEstados.Excluir(oEstado);
-                //}
+                else if(this.btnSalvar.Text == "Excluir")
+                    MessageBox.Show(aCtrlEstados.Excluir(oEstado.Clone()));
             }
         }
 

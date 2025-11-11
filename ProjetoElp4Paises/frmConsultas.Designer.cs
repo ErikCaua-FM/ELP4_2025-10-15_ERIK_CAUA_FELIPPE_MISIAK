@@ -38,6 +38,7 @@
             // 
             // txtCodigo
             // 
+            this.txtCodigo.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.txtCodigo.Size = new System.Drawing.Size(202, 22);
             this.txtCodigo.TabIndex = 0;
             // 

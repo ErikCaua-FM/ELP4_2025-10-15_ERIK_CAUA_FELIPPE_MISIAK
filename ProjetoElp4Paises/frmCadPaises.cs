@@ -19,22 +19,23 @@ namespace ProjetoElp4Paises
 
         public override void Salvar()
         {
-            //if (MessageDlg("Confirma (S/N)") == "S")
+            //if (MessageBox.Show("Confirma (S/N)") == "S")
             {
                 oPais.Codigo = Convert.ToInt32(txtCodigo.Text);
                 oPais.Pais = txtPais.Text;
                 oPais.Sigla = txtSigla.Text;
                 oPais.Ddi = txtDDI.Text;
                 oPais.Moeda = txtMoeda.Text;
-                //if(this.btnSalvar.Text == "&Salvar")
+                if(this.btnSalvar.Text == "&Salvar")
                     MessageBox.Show(aCtrlPaises.Salvar(oPais.Clone()));
-                //else if (this.btnSalvar.Text == "Excluir")
-                    //aCtrlPaises.Excluir(oPais);
+                else if (this.btnSalvar.Text == "Excluir")
+                    MessageBox.Show(aCtrlPaises.Excluir(oPais.Clone()));
             }
         }
 
         public override void CarregaTxt()
         {
+
             this.txtCodigo.Text = Convert.ToString(oPais.Codigo);
             this.txtPais.Text = oPais.Pais;
             this.txtSigla.Text = oPais.Sigla;

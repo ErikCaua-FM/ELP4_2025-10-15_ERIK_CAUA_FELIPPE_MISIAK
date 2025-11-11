@@ -42,10 +42,24 @@ namespace ProjetoElp4Paises
 
         public override string Excluir(object obj)
         {
-            return "";
+            Paises oPais = (Paises)obj;
+            string mSql = $"delete from paises where id = @id";
+            try
+            {
+                using (SqlCommand cmd = new SqlCommand(mSql, cnn))
+                {
+                    cmd.Parameters.AddWithValue("@id", oPais.Codigo);
+                    cmd.ExecuteNonQuery();
+                }
+                return $"País '{oPais.Pais}' removido com sucesso!";
+            }
+            catch (Exception ex) 
+            {
+                return $"ERRO: País '{oPais.Pais}' vinculado a um ou mais estados!";
+            }
         }
 
-        public override List<Paises> Listar()
+        public override List<Paises>  Listar()
         {
             string mSql = "select * from paises order by id";
             using (SqlCommand cmd = new SqlCommand(mSql, cnn))
@@ -72,12 +86,52 @@ namespace ProjetoElp4Paises
 
         public override Object CarregaObj(int chave)
         {
-            return null;
+            string mSql = $"select * from paises where id = {chave}";
+            Paises oPais = null;
+            using (SqlCommand cmd = new SqlCommand(mSql, cnn))
+            {
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    oPais = new Paises(
+                        Convert.ToInt32(reader["id"]),
+                        Convert.ToDateTime(reader["datCad"]),
+                        Convert.ToDateTime(reader["ultAlt"]),
+                        reader["Pais"].ToString(),
+                        reader["Sigla"].ToString(),
+                        reader["DDI"].ToString(),
+                        reader["Moeda"].ToString()
+                    );
+                }
+                reader.Close();
+            }
+            return oPais;
         }
 
         public override List<Paises> Pesquisar(string chave)
         {
-            return null;
+            string mSql = $"select * from paises where pais like '%{chave}%' or id like '%{chave}%' or sigla like '%{chave}%' or ddi like '%{chave}%' or moeda like '%{chave}%'";
+            using (SqlCommand cmd = new SqlCommand(mSql, cnn))
+            {
+                SqlDataReader reader = cmd.ExecuteReader();
+                List<Paises> lista = new List<Paises>();
+                while (reader.Read())
+                {
+                    Paises oPais = new Paises(
+                        Convert.ToInt32(reader["id"]),
+                        Convert.ToDateTime(reader["datCad"]),
+                        Convert.ToDateTime(reader["ultAlt"]),
+                        reader["Pais"].ToString(),
+                        reader["Sigla"].ToString(),
+                        reader["DDI"].ToString(),
+                        reader["Moeda"].ToString()
+                    );
+                    //if(oPais.Pais.Contains(chave) || oPais.Sigla == chave || oPais.Ddi == chave)
+                    lista.Add(oPais);
+                }
+                reader.Close();
+                return lista;
+            }
         }
     }
 }

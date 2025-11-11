@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -20,6 +21,7 @@ namespace ProjetoElp4Paises
 
         protected override void Pesquisar()
         {
+            this.CarregaLv(txtCodigo.Text);
         }
 
         protected override void Incluir()
@@ -27,11 +29,13 @@ namespace ProjetoElp4Paises
             oFrmCadCidades.LimpaTxt();
             oFrmCadCidades.ConhecaObjeto(aCidade, aCtrlCidades);
             oFrmCadCidades.ShowDialog();
-            this.CarregaLv();
+            this.CarregaLv("");
         }
 
         protected override void Excluir()
         {
+            int chave = Convert.ToInt32(ListV.SelectedItems[0].SubItems[0].Text);
+            aCidade = (Cidades)aCtrlCidades.CarregaObj(chave);
             string aux;
             oFrmCadCidades.ConhecaObjeto(aCidade, aCtrlCidades);
             oFrmCadCidades.LimpaTxt();
@@ -42,29 +46,47 @@ namespace ProjetoElp4Paises
             oFrmCadCidades.ShowDialog();
             oFrmCadCidades.DesbloquearTxt();
             oFrmCadCidades.btnSalvar.Text = aux;
-            this.CarregaLv();
+            this.CarregaLv("");
         }
 
         protected override void Alterar()
         {
+            int chave = Convert.ToInt32(ListV.SelectedItems[0].SubItems[0].Text);
+            aCidade = (Cidades)aCtrlCidades.CarregaObj(chave);
             oFrmCadCidades.ConhecaObjeto(aCidade, aCtrlCidades);
             oFrmCadCidades.LimpaTxt();
             oFrmCadCidades.CarregaTxt();
             oFrmCadCidades.ShowDialog();
-            this.CarregaLv();
+            this.CarregaLv("");
         }
 
-        protected override void CarregaLv()
+        protected override void CarregaLv(string chave)
         {
-            ListV.Items.Clear();
-            foreach(var aCidade in aCtrlCidades.TodasCidades())
+            if(chave == string.Empty)
             {
-                ListViewItem item = new ListViewItem(Convert.ToString(aCidade.Codigo));
-                item.SubItems.Add(aCidade.Cidade);
-                item.SubItems.Add(aCidade.DDD);
-                item.SubItems.Add(aCidade.OEstado.Codigo.ToString());
-                item.SubItems.Add(aCidade.OEstado.Estado);
-                ListV.Items.Add(item);
+                ListV.Items.Clear();
+                foreach (var aCidade in aCtrlCidades.TodasCidades())
+                {
+                    ListViewItem item = new ListViewItem(Convert.ToString(aCidade.Codigo));
+                    item.SubItems.Add(aCidade.Cidade);
+                    item.SubItems.Add(aCidade.DDD);
+                    item.SubItems.Add(aCidade.OEstado.Codigo.ToString());
+                    item.SubItems.Add(aCidade.OEstado.Estado);
+                    ListV.Items.Add(item);
+                }
+            }
+            else
+            {
+                ListV.Items.Clear();
+                foreach (var aCidade in aCtrlCidades.Pesquisar(chave).Cast<Cidades>().ToList())
+                {
+                    ListViewItem item = new ListViewItem(Convert.ToString(aCidade.Codigo));
+                    item.SubItems.Add(aCidade.Cidade);
+                    item.SubItems.Add(aCidade.DDD);
+                    item.SubItems.Add(aCidade.OEstado.Codigo.ToString());
+                    item.SubItems.Add(aCidade.OEstado.Estado);
+                    ListV.Items.Add(item);
+                }
             }
         }
 
@@ -82,7 +104,7 @@ namespace ProjetoElp4Paises
                 aCidade = (Cidades)obj;
             if (ctrl != null)
                 aCtrlCidades = (CtrlCidades)ctrl;
+            this.Pesquisar();
         }
-
     }
 }

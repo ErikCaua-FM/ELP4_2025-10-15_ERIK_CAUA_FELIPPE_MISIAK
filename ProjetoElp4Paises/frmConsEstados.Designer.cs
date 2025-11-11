@@ -41,6 +41,7 @@
             this.colUF,
             this.colCodigoPais,
             this.colPais});
+            this.ListV.SelectedIndexChanged += new System.EventHandler(this.ListV_SelectedIndexChanged);
             // 
             // colEstado
             // 

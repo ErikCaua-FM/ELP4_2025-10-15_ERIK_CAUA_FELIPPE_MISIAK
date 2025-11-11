@@ -50,5 +50,15 @@ namespace ProjetoElp4Paises
         {
             return aDaoPaises.Listar();
         }
+
+        public override object CarregaObj(int chave)
+        {
+            return aDaoPaises.CarregaObj(chave);
+        }
+
+        public override List<Object> Pesquisar(string chave)
+        {
+            return aDaoPaises.Pesquisar(chave).Cast<object>().ToList();
+        }
     }
 }
